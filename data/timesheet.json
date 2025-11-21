@@ -6,6 +6,16 @@
       "color": "#f97316"
     }
   ],
-  "entries": [],
-  "lastModified": 1763748857741
+  "entries": [
+    {
+      "id": "992d0af7-4150-4d91-83d6-f789ca4ab1d7",
+      "projectId": "9aab0132-8bc7-4d82-80c0-15f2ac608d02",
+      "task": "xxcbxcvb",
+      "date": "2025-11-21",
+      "hours": 0.04,
+      "startTime": 1763755748290,
+      "endTime": 1763755907803
+    }
+  ],
+  "lastModified": 1763755907804
 }
