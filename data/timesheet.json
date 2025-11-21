@@ -15,7 +15,16 @@
       "hours": 0.04,
       "startTime": 1763755748290,
       "endTime": 1763755907803
+    },
+    {
+      "id": "4e1e6e17-37be-4743-90dc-d7cdb0d0c384",
+      "projectId": "9aab0132-8bc7-4d82-80c0-15f2ac608d02",
+      "task": "Rehearse first slides from 1 to 16 + flow (text and bullet points)",
+      "date": "2025-11-21",
+      "hours": 0.06,
+      "startTime": 1763757528835,
+      "endTime": 1763757751318
     }
   ],
-  "lastModified": 1763755907804
+  "lastModified": 1763757751318
 }
