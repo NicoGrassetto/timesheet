@@ -1,19 +1,31 @@
-import { useKV } from '@github/spark/hooks'
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { FileArrowDown } from '@phosphor-icons/react'
 import { groupEntriesByProject, calculateTotalHours } from '@/lib/utils.helpers'
 import type { Project, TimeEntry } from '@/lib/types'
+import type { UseHybridDatabaseReturn } from '@/hooks/useHybridDatabase'
+import { exportAllEntries } from '@/services/exportService'
 
 interface ReportsViewProps {
-  projects: Project[]
+  database: UseHybridDatabaseReturn
 }
 
-export function ReportsView({ projects }: ReportsViewProps) {
-  const [entries] = useKV<TimeEntry[]>('time-entries', [])
+export function ReportsView({ database }: ReportsViewProps) {
+  const { projects, entries } = database
 
-  const groupedEntries = groupEntriesByProject(entries || [])
-  const totalHours = calculateTotalHours(entries || [])
+  const groupedEntries = groupEntriesByProject(entries)
+  const totalHours = calculateTotalHours(entries)
+
+  const handleExport = async () => {
+    try {
+      await exportAllEntries(entries, projects)
+    } catch (err) {
+      console.error('Failed to export report:', err)
+      alert('Failed to export report. Please try again.')
+    }
+  }
 
   const projectStats = projects.map(project => {
     const projectEntries = groupedEntries[project.id] || []
@@ -32,9 +44,20 @@ export function ReportsView({ projects }: ReportsViewProps) {
   return (
     <Card className="p-6">
       <div className="space-y-6">
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Reports & Analytics</h2>
-          <p className="text-sm text-muted-foreground">Time distribution across projects</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Reports & Analytics</h2>
+            <p className="text-sm text-muted-foreground">Time distribution across projects</p>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleExport}
+            disabled={entries.length === 0}
+          >
+            <FileArrowDown className="mr-2" />
+            Export to Word
+          </Button>
         </div>
 
         {projectStats.length === 0 ? (
@@ -54,7 +77,7 @@ export function ReportsView({ projects }: ReportsViewProps) {
               </Card>
               <Card className="p-4">
                 <div className="text-sm text-muted-foreground">Entries</div>
-                <div className="text-3xl font-bold font-mono mt-1">{(entries || []).length}</div>
+                <div className="text-3xl font-bold font-mono mt-1">{entries.length}</div>
               </Card>
             </div>
 

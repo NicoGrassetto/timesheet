@@ -1,26 +1,27 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { CaretLeft, CaretRight, Trash } from '@phosphor-icons/react'
+import { CaretLeft, CaretRight, Trash, FileArrowDown } from '@phosphor-icons/react'
 import { format, parseISO, isWithinInterval } from 'date-fns'
 import { getWeekDays, getCurrentWeekRange, formatDuration, calculateTotalHours } from '@/lib/utils.helpers'
 import type { Project, TimeEntry } from '@/lib/types'
+import type { UseHybridDatabaseReturn } from '@/hooks/useHybridDatabase'
+import { exportWeeklyTimesheet } from '@/services/exportService'
 
 interface WeeklyTimesheetProps {
-  projects: Project[]
+  database: UseHybridDatabaseReturn
 }
 
-export function WeeklyTimesheet({ projects }: WeeklyTimesheetProps) {
-  const [entries, setEntries] = useKV<TimeEntry[]>('time-entries', [])
+export function WeeklyTimesheet({ database }: WeeklyTimesheetProps) {
+  const { projects, entries, deleteEntry: removeEntry } = database
   const [weekOffset, setWeekOffset] = useState(0)
 
   const weekDays = getWeekDays(weekOffset)
   const { start, end } = getCurrentWeekRange(weekOffset)
 
-  const weekEntries = (entries || []).filter(entry => {
+  const weekEntries = entries.filter(entry => {
     const entryDate = parseISO(entry.date)
     return isWithinInterval(entryDate, { start, end })
   })
@@ -36,8 +37,21 @@ export function WeeklyTimesheet({ projects }: WeeklyTimesheetProps) {
     return calculateTotalHours(getDayEntries(day))
   }
 
-  const deleteEntry = (id: string) => {
-    setEntries((current) => (current || []).filter(e => e.id !== id))
+  const handleDeleteEntry = async (id: string, projectId: string) => {
+    try {
+      await removeEntry(id, projectId)
+    } catch (err) {
+      console.error('Failed to delete entry:', err)
+    }
+  }
+
+  const handleExport = async () => {
+    try {
+      await exportWeeklyTimesheet(weekEntries, projects, start, end)
+    } catch (err) {
+      console.error('Failed to export timesheet:', err)
+      alert('Failed to export timesheet. Please try again.')
+    }
   }
 
   return (
@@ -46,6 +60,15 @@ export function WeeklyTimesheet({ projects }: WeeklyTimesheetProps) {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Weekly Timesheet</h2>
           <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleExport}
+              disabled={weekEntries.length === 0}
+            >
+              <FileArrowDown className="mr-2" />
+              Export to Word
+            </Button>
             <Button variant="outline" size="icon" onClick={() => setWeekOffset(weekOffset - 1)}>
               <CaretLeft />
             </Button>
@@ -110,7 +133,7 @@ export function WeeklyTimesheet({ projects }: WeeklyTimesheetProps) {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => deleteEntry(entry.id)}
+                                onClick={() => handleDeleteEntry(entry.id, entry.projectId)}
                               >
                                 <Trash className="text-destructive" />
                               </Button>

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -8,6 +7,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge'
 import { Plus, Trash } from '@phosphor-icons/react'
 import type { Project } from '@/lib/types'
+import type { UseHybridDatabaseReturn } from '@/hooks/useHybridDatabase'
+
+interface ProjectManagerProps {
+  database: UseHybridDatabaseReturn
+}
 
 const PRESET_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308',
@@ -16,32 +20,39 @@ const PRESET_COLORS = [
   '#8b5cf6', '#a855f7', '#d946ef', '#ec4899'
 ]
 
-export function ProjectManager() {
-  const [projects, setProjects] = useKV<Project[]>('projects', [])
+export function ProjectManager({ database }: ProjectManagerProps) {
+  const { projects, isLoading: loading, error, addProject, deleteProject: removeProject } = database
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [color, setColor] = useState(PRESET_COLORS[0])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!name) return
 
     const newProject: Project = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       name,
       color
     }
 
-    setProjects((current) => [...(current || []), newProject])
-    
-    setName('')
-    setColor(PRESET_COLORS[0])
-    setOpen(false)
+    try {
+      await addProject(newProject)
+      setName('')
+      setColor(PRESET_COLORS[0])
+      setOpen(false)
+    } catch (err) {
+      console.error('Failed to add project:', err)
+    }
   }
 
-  const deleteProject = (id: string) => {
-    setProjects((current) => (current || []).filter(p => p.id !== id))
+  const handleDeleteProject = async (id: string) => {
+    try {
+      await removeProject(id)
+    } catch (err) {
+      console.error('Failed to delete project:', err)
+    }
   }
 
   return (
@@ -98,13 +109,21 @@ export function ProjectManager() {
           </Dialog>
         </div>
 
-        {(projects || []).length === 0 ? (
+        {loading ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">
+            Loading projects...
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-destructive text-sm">
+            Error: {error}
+          </div>
+        ) : projects.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground text-sm">
             No projects yet. Add one to start tracking time.
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {(projects || []).map((project) => (
+            {projects.map((project) => (
               <Badge key={project.id} variant="secondary" className="gap-2 pr-1 text-sm py-1">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: project.color }} />
                 {project.name}
@@ -112,7 +131,7 @@ export function ProjectManager() {
                   variant="ghost"
                   size="icon"
                   className="h-5 w-5 ml-1"
-                  onClick={() => deleteProject(project.id)}
+                  onClick={() => handleDeleteProject(project.id)}
                 >
                   <Trash className="w-3 h-3" />
                 </Button>

@@ -1,23 +1,80 @@
-import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TimerComponent } from '@/components/TimerComponent'
 import { ManualEntryForm } from '@/components/ManualEntryForm'
 import { WeeklyTimesheet } from '@/components/WeeklyTimesheet'
 import { ReportsView } from '@/components/ReportsView'
 import { ProjectManager } from '@/components/ProjectManager'
-import { Clock, CalendarBlank, ChartBar, FolderOpen } from '@phosphor-icons/react'
-import type { Project } from '@/lib/types'
+import { Clock, CalendarBlank, ChartBar, FolderOpen, CloudArrowUp } from '@phosphor-icons/react'
+import { useHybridDatabase } from '@/hooks/useHybridDatabase'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 function App() {
-  const [projects] = useKV<Project[]>('projects', [])
+  const database = useHybridDatabase()
+  const { 
+    projects, 
+    isLoading, 
+    isSyncing, 
+    lastSyncTime, 
+    error,
+    syncNow,
+    isConfigured 
+  } = database
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your timesheet...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold mb-2">Timesheet</h1>
-          <p className="text-muted-foreground">Track time, manage projects, analyze productivity</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">Timesheet</h1>
+            <p className="text-muted-foreground">Track time, manage projects, analyze productivity</p>
+          </div>
+          <div className="flex items-center gap-4">
+            {isConfigured && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={syncNow}
+                disabled={isSyncing}
+                className="gap-2"
+              >
+                <CloudArrowUp className={isSyncing ? 'animate-pulse' : ''} />
+                {isSyncing ? 'Syncing...' : 'Sync to GitHub'}
+              </Button>
+            )}
+            {lastSyncTime && (
+              <span className="text-xs text-muted-foreground">
+                Last synced: {new Date(lastSyncTime).toLocaleTimeString()}
+              </span>
+            )}
+          </div>
         </div>
+
+        {!isConfigured && (
+          <Alert className="mb-6">
+            <AlertDescription>
+              💡 <strong>GitHub sync not configured.</strong> Your data is saved locally. 
+              To enable cloud backup, add VITE_GITHUB_OWNER, VITE_GITHUB_REPO, and VITE_GITHUB_TOKEN to your .env file.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         <Tabs defaultValue="timer" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
@@ -41,9 +98,9 @@ function App() {
 
           <TabsContent value="timer" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TimerComponent projects={projects || []} />
+              <TimerComponent database={database} />
               <div className="space-y-4">
-                <ManualEntryForm projects={projects || []} />
+                <ManualEntryForm database={database} />
                 <div className="text-sm text-muted-foreground">
                   Start a timer to track time automatically, or add entries manually for past work.
                 </div>
@@ -52,15 +109,15 @@ function App() {
           </TabsContent>
 
           <TabsContent value="timesheet">
-            <WeeklyTimesheet projects={projects || []} />
+            <WeeklyTimesheet database={database} />
           </TabsContent>
 
           <TabsContent value="reports">
-            <ReportsView projects={projects || []} />
+            <ReportsView database={database} />
           </TabsContent>
 
           <TabsContent value="projects">
-            <ProjectManager />
+            <ProjectManager database={database} />
           </TabsContent>
         </Tabs>
       </div>

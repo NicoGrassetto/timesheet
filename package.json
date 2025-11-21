@@ -4,8 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
-        "kill": "fuser -k 5000/tcp",
+        "dev": "vite --port 3000",
         "build": "tsc -b --noCheck && vite build",
         "lint": "eslint .",
         "optimize": "vite optimize",
@@ -52,7 +51,9 @@
         "cmdk": "^1.1.1",
         "d3": "^7.9.0",
         "date-fns": "^3.6.0",
+        "docx": "^9.5.1",
         "embla-carousel-react": "^8.5.2",
+        "file-saver": "^2.0.5",
         "framer-motion": "^12.6.2",
         "input-otp": "^1.4.2",
         "lucide-react": "^0.484.0",
@@ -77,6 +78,7 @@
     "devDependencies": {
         "@eslint/js": "^9.21.0",
         "@tailwindcss/postcss": "^4.1.8",
+        "@types/file-saver": "^2.0.7",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
         "@vitejs/plugin-react": "^4.3.4",
