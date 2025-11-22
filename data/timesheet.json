@@ -4,6 +4,11 @@
       "id": "9aab0132-8bc7-4d82-80c0-15f2ac608d02",
       "name": "Cloud & AI Summit",
       "color": "#f97316"
+    },
+    {
+      "id": "941ab84e-ecab-425b-af43-4ccd59b4208d",
+      "name": "fewfwefew",
+      "color": "#f97316"
     }
   ],
   "entries": [
@@ -26,5 +31,5 @@
       "endTime": 1763757751318
     }
   ],
-  "lastModified": 1763757751318
+  "lastModified": 1763832224523
 }
