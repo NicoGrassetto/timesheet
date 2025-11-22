@@ -1,4 +1,4 @@
-# Timesheet Tracker
+# Timesheet
 
 A lightweight, offline-first timesheet tracking application with optional GitHub backup sync. Track your work hours, manage projects, and generate detailed reports - all running entirely in your browser with no backend required.
 
