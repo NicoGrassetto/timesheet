@@ -83,7 +83,7 @@ This setup runs the app entirely in your browser with localStorage. No cloud syn
    ```bash
    npm run dev
    ```
-   The app will be available at `http://localhost:5173` (not port 3000 as mentioned earlier).
+   The app will be available at `http://localhost:5173`.
    Open your browser and navigate to this URL.
 
 4. **Start Using the App**
@@ -457,16 +457,17 @@ npm run dev    # Start development server with auto-reload
 
 ## Troubleshooting
 
-### Build Errors with @github/spark
+### Build Errors
 
-If you see errors about `@github/spark` during build:
+If you encounter build errors with missing packages:
 
-**Issue**: This is a GitHub internal package that may not be publicly available.
+**Issue**: Some packages may not be installed correctly or may have dependency issues.
 
-**Solution**: The package appears to be used for Vite plugins. If you encounter this error:
-1. Check if there are updates to the package
-2. Consider removing the spark-related plugins from `vite.config.ts` if not needed
-3. The app should work in development mode with `npm run dev` even if build fails
+**Solution**: 
+1. Delete `node_modules` and `package-lock.json`
+2. Run `npm install` again
+3. If the issue persists, try `npm ci` for a clean install
+4. The app should work in development mode with `npm run dev` even if production build has issues
 
 ### Port Already in Use
 
