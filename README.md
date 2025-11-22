@@ -1,6 +1,6 @@
 # Timesheet Tracker
 
-A lightweight, offline-first timesheet tracking application with optional GitHub backup sync. Track your work hours, manage projects, and generate detailed reports - all running entirely in your browser with zero backend costs.
+A lightweight, offline-first timesheet tracking application with optional GitHub backup sync. Track your work hours, manage projects, and generate detailed reports - all running entirely in your browser with no backend required.
 
 ## Table of Contents
 
@@ -10,7 +10,6 @@ A lightweight, offline-first timesheet tracking application with optional GitHub
   - [Prerequisites](#prerequisites)
   - [Basic Setup (Offline Mode)](#basic-setup-offline-mode)
   - [GitHub Sync Setup (Optional)](#github-sync-setup-optional)
-  - [Azure Cosmos DB Backend (Optional)](#azure-cosmos-db-backend-optional)
 - [How It Works](#how-it-works)
 - [Usage Guide](#usage-guide)
 - [Project Structure](#project-structure)
@@ -27,8 +26,7 @@ A lightweight, offline-first timesheet tracking application with optional GitHub
 - **Project Management** - Create and manage color-coded projects for easy organization
 - **Offline-First** - All data stored locally in your browser, works without internet
 - **Optional GitHub Sync** - Automatic cloud backup to your private GitHub repository
-- **Optional Backend** - Use Azure Cosmos DB for multi-device sync via REST API
-- **No Backend Required** - Pure frontend SPA by default, no server maintenance
+- **No Backend Required** - Pure frontend SPA, no server maintenance needed
 - **Export Reports** - Generate professional DOCX reports with time breakdowns
 - **Zero Cost** - Completely free to run (GitHub sync is free with GitHub account)
 
@@ -46,7 +44,6 @@ A lightweight, offline-first timesheet tracking application with optional GitHub
 ### Storage Options
 - **localStorage** - Primary storage (always enabled)
 - **GitHub API** - Optional cloud backup and sync
-- **Azure Cosmos DB** - Optional backend database for multi-device sync
 
 ## Installation
 
@@ -176,76 +173,11 @@ Enable this if you want automatic cloud backup and cross-device sync using GitHu
 - Pushes local changes to GitHub in the background
 - Works seamlessly - you won't notice it happening
 
-### Azure Cosmos DB Backend (Optional)
-
-For advanced users who need a REST API backend with Azure Cosmos DB. This is an alternative to GitHub sync.
-
-**When to use this:**
-- You need a traditional database backend
-- You're already using Azure infrastructure
-- You need more complex query capabilities
-- You want to integrate with other Azure services
-
-**Setup Steps:**
-
-1. **Azure Prerequisites**
-   - Azure account with active subscription
-   - Azure Cosmos DB account (create one in Azure Portal)
-   - Service principal with access to your Cosmos DB
-
-2. **Create Server Environment Configuration**
-   
-   Navigate to the server directory and create a `.env` file:
-   ```bash
-   cd server
-   touch .env
-   ```
-   
-   Add your Azure configuration:
-   ```env
-   # Azure Cosmos DB Configuration
-   COSMOS_DB_ENDPOINT=https://your-account.documents.azure.com:443/
-   COSMOS_DB_DATABASE_NAME=timesheetdb
-   COSMOS_DB_PROJECTS_CONTAINER=projects
-   COSMOS_DB_ENTRIES_CONTAINER=entries
-   
-   # Azure AD Service Principal
-   AZURE_CLIENT_ID=your-client-id
-   AZURE_CLIENT_SECRET=your-client-secret
-   AZURE_TENANT_ID=your-tenant-id
-   
-   # Server Configuration
-   PORT=3001
-   ```
-
-3. **Install Server Dependencies**
-   ```bash
-   npm install
-   ```
-
-4. **Start the Backend Server**
-   ```bash
-   npm start
-   ```
-   
-   Or for development with auto-reload:
-   ```bash
-   npm run dev
-   ```
-   
-   The API will be available at `http://localhost:3001/api`
-
-5. **Configure Frontend to Use Backend**
-   
-   Update your frontend code to point to the backend API instead of localStorage/GitHub sync. You'll need to modify the `useHybridDatabase` hook to make HTTP requests to `http://localhost:3001/api`.
-
-**Note**: This backend option is completely separate from GitHub sync. Choose one or the other based on your needs.
-
 ## How It Works
 
 ### Architecture Overview
 
-Timesheet Tracker uses a hybrid storage architecture with three possible modes:
+Timesheet Tracker uses a hybrid storage architecture with two possible modes:
 
 #### Mode 1: Offline-Only (Default)
 - All data stored in browser localStorage
@@ -266,12 +198,6 @@ Timesheet Tracker uses a hybrid storage architecture with three possible modes:
   - Free cloud backup
   - No server maintenance
 
-#### Mode 3: Azure Cosmos DB Backend (Advanced)
-- Traditional REST API backend
-- Azure Cosmos DB for data persistence
-- Separate server process required
-- Best for integration with existing Azure infrastructure
-
 ### Data Flow
 
 **Local Storage:**
@@ -286,11 +212,6 @@ User Action → State Update → localStorage → UI Update
          GitHub API Push → Remote Repository
          
 App Load → Check GitHub → Compare timestamps → Pull if newer → Update local
-```
-
-**Backend API:**
-```
-User Action → API Request → Cosmos DB → API Response → State Update → UI Update
 ```
 
 ### Data Structure
@@ -402,9 +323,6 @@ timesheet-tracker/
 │   │   └── utils.helpers.ts      # Utility functions
 │   ├── App.tsx                   # Main application component
 │   └── main.tsx                  # Application entry point
-├── server/                       # Optional backend server
-│   ├── index.js                  # Express server with Cosmos DB
-│   └── package.json              # Server dependencies
 ├── public/                       # Static assets
 ├── .env.example                  # Environment variables template
 ├── package.json                  # Frontend dependencies and scripts
@@ -444,16 +362,6 @@ Locally preview the production build before deploying.
 npm run lint
 ```
 Runs ESLint to check code quality and style issues.
-
-### Server Scripts
-
-If using the optional backend:
-
-```bash
-cd server
-npm start      # Start production server
-npm run dev    # Start development server with auto-reload
-```
 
 ## Troubleshooting
 
@@ -506,7 +414,6 @@ Or simply change the port in `vite.config.ts`.
 **Solution**: 
 - Browser localStorage has a 5-10MB limit
 - Clear old data or use GitHub sync as primary storage
-- Consider the Azure backend option for unlimited storage
 
 ### TypeScript Errors
 
