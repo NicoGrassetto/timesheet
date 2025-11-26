@@ -4,13 +4,13 @@ A modern time tracking application built with React and Azure SQL Database. Trac
 
 ## Features
 
-- ⏱️ **Timer** – Start/stop timer for real-time tracking
-- 📝 **Manual Entry** – Add time entries manually for past work
-- 📊 **Weekly Timesheet** – View and edit entries in a weekly grid
-- 📈 **Reports** – Analyze time by project with charts
-- 📁 **Project Management** – Create and manage projects with colors and rates
-- 💾 **Azure SQL Storage** – Data persisted to Azure SQL Database
-- 📄 **Export Reports** – Generate professional DOCX reports
+- **Timer** – Start/stop timer for real-time tracking
+- **Manual Entry** – Add time entries manually for past work
+- **Weekly Timesheet** – View and edit entries in a weekly grid
+- **Reports** – Analyze time by project with charts
+- **Project Management** – Create and manage projects with colors and rates
+- **Azure SQL Storage** – Data persisted to Azure SQL Database
+- **Export Reports** – Generate professional DOCX reports
 
 ## Tech Stack
 
