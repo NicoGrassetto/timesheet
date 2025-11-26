@@ -4,7 +4,7 @@ import { ManualEntryForm } from '@/components/ManualEntryForm'
 import { WeeklyTimesheet } from '@/components/WeeklyTimesheet'
 import { ReportsView } from '@/components/ReportsView'
 import { ProjectManager } from '@/components/ProjectManager'
-import { Clock, CalendarBlank, ChartBar, FolderOpen, CloudArrowUp } from '@phosphor-icons/react'
+import { Clock, CalendarBlank, ChartBar, FolderOpen, ArrowsClockwise } from '@phosphor-icons/react'
 import { useHybridDatabase } from '@/hooks/useHybridDatabase'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -49,13 +49,13 @@ function App() {
                 disabled={isSyncing}
                 className="gap-2"
               >
-                <CloudArrowUp className={isSyncing ? 'animate-pulse' : ''} />
-                {isSyncing ? 'Syncing...' : 'Sync to GitHub'}
+                <ArrowsClockwise className={isSyncing ? 'animate-spin' : ''} />
+                {isSyncing ? 'Syncing...' : 'Refresh'}
               </Button>
             )}
             {lastSyncTime && (
               <span className="text-xs text-muted-foreground">
-                Last synced: {new Date(lastSyncTime).toLocaleTimeString()}
+                Last updated: {new Date(lastSyncTime).toLocaleTimeString()}
               </span>
             )}
           </div>
@@ -64,8 +64,7 @@ function App() {
         {!isConfigured && (
           <Alert className="mb-6">
             <AlertDescription>
-              💡 <strong>GitHub sync not configured.</strong> Your data is saved locally. 
-              To enable cloud backup, add VITE_GITHUB_OWNER, VITE_GITHUB_REPO, and VITE_GITHUB_TOKEN to your .env file.
+              ⚠️ <strong>Cannot connect to API server.</strong> Make sure the backend is running with <code>npm run dev</code>.
             </AlertDescription>
           </Alert>
         )}
